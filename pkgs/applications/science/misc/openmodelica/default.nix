@@ -1,8 +1,9 @@
-{stdenv, fetchFromGitHub, fetchgit, fetchsvn, autoconf, automake, libtool,
+{stdenv, lib, mkDerivation, fetchFromGitHub, fetchgit, fetchsvn, autoconf, automake, libtool,
 gfortran, clang, cmake, gnumake, hwloc, jre, openblas, hdf5, expat, ncurses,
-readline, qt4, webkit, which, lp_solve, omniorb, sqlite, libatomic_ops,
+readline, qtbase, qmake, qttools, qtwebkit, webkit, which, lp_solve, omniorb, sqlite, libatomic_ops,
 pkgconfig, file, gettext, flex, bison, doxygen, boost, openscenegraph, gnome2,
-xorg, git, bash, gtk2, makeWrapper }:
+ipopt,
+xorg, git, bash, gtk2, makeWrapper, autoreconfHook }:
 
 let
 
@@ -10,24 +11,21 @@ let
 
 in
 
-stdenv.mkDerivation rec {
-  name = "openmodelica";
+mkDerivation rec {
+  pname = "openmodelica";
   version = "1.13.0";
   src = fetchgit (import ./src-main.nix);
 
-  src = fetchFromGitHub {
-    owner = "OpenModelica";
-    repo = "OpenModelica";
-    rev = "v${version}";
-    fetchSubmodules = true;
-    sha256 = "00vbhvqm79pndx03g1azdsv12yraxnwa5j4sqy5w35bm448ahzjp";
-  };
+  nativeBuildInputs = [autoconf automake libtool cmake qttools gfortran clang makeWrapper
+    flex bison doxygen
+    pkgconfig file
+    autoreconfHook];
 
-  buildInputs = [autoconf cmake automake libtool gfortran clang gnumake hwloc
-    jre openblas hdf5 expat ncurses readline qt4 webkit which lp_solve omniorb
-    sqlite libatomic_ops pkgconfig file gettext flex bison doxygen boost
-    openscenegraph gnome2.gtkglext xorg.libXmu git gtk2
-    makeWrapper];
+  buildInputs = [hwloc
+    jre openblas hdf5 expat ncurses readline qtbase qtwebkit webkit which lp_solve
+    omniorb sqlite libatomic_ops gettext boost
+    ipopt
+    openscenegraph gnome2.gtkglext xorg.libXmu git gtk2 makeWrapper];
 
   hardeningDisable = [ "format" ];
 
@@ -36,14 +34,10 @@ stdenv.mkDerivation rec {
   patchPhase = ''
     cp -fv ${fakegit}/bin/checkout-git.sh libraries/checkout-git.sh
     cp -fv ${fakegit}/bin/checkout-svn.sh libraries/checkout-svn.sh
+    sed -i ''$(find -name qmake.m4) -e '/^\s*LRELEASE=/ s|LRELEASE=.*$|LRELEASE=${lib.getDev qttools}/bin/lrelease|'
   '';
 
-  configurePhase = ''
-    export NIX_LDFLAGS="$NIX_LDFLAGS -L${gfortran.cc.lib}/lib"
-
-    autoconf
-    ./configure CC=${clang}/bin/clang CXX=${clang}/bin/clang++ --prefix=$out
-  '';
+  dontUseCmakeConfigure = true;
 
   postFixup = ''
     for e in $(cd $out/bin && ls); do
@@ -53,7 +47,7 @@ stdenv.mkDerivation rec {
     done
   '';
 
-  meta = with stdenv.lib; {
+  meta = with lib; {
     description = "An open-source Modelica-based modeling and simulation environment";
     homepage    = "https://openmodelica.org";
     license     = licenses.gpl3;
