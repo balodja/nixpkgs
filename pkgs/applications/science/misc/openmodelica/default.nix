@@ -13,6 +13,7 @@ in
 stdenv.mkDerivation rec {
   name = "openmodelica";
   version = "1.13.0";
+  src = fetchgit (import ./src-main.nix);
 
   src = fetchFromGitHub {
     owner = "OpenModelica";
