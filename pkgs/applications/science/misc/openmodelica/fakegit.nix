@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchgit, fetchsvn, bash }:
+{stdenv, fetchgit, bash } :
 
 let
   mkscript = path : text : ''
@@ -11,9 +11,9 @@ let
     sed -i "s@%out@$out@g" ${path}
     chmod +x ${path}
   '';
-
+  
   hashname = r: let
-    rpl = lib.replaceChars [":" "/"] ["_" "_"];
+    rpl = stdenv.lib.replaceChars [":" "/"] ["_" "_"];
   in
     (rpl r.url) + "-" + (rpl r.rev);
 
@@ -24,7 +24,7 @@ stdenv.mkDerivation {
 
   buildCommand = ''
     mkdir -pv $out/repos
-    ${lib.concatMapStrings
+    ${stdenv.lib.concatMapStrings
        (r : ''
         cp -r ${fetchgit r} $out/repos/${hashname r}
        ''
@@ -51,29 +51,6 @@ stdenv.mkDerivation {
       rm -rf $DEST
       mkdir -pv $DEST
       echo "FAKEGIT cp -r %out/repos/$URL-$REVISION $DEST" >&2
-      cp -r %out/repos/$URL-$REVISION/* $DEST
-      chmod u+w -R $DEST
-    ''}
-
-    ${lib.concatMapStrings
-       (r : ''
-        cp -r ${fetchsvn r} $out/repos/${hashname r}
-       ''
-       ) (import ./src-libs-svn.nix)
-    }
-
-    ${mkscript "$out/bin/checkout-svn.sh" ''
-      if test "$#" -ne 3; then
-        echo "Usage: $0 DESTINATION URL REVISION"
-        exit 1
-      fi
-      DEST=$1
-      URL=`echo $2 | tr :/ __`
-      REVISION=`echo $4 | tr :/ __`
-
-      rm -rf $DEST
-      mkdir -pv $DEST
-      echo "FAKE COPY %out/repos/$URL-$REVISION $DEST"
       cp -r %out/repos/$URL-$REVISION/* $DEST
       chmod u+w -R $DEST
     ''}
