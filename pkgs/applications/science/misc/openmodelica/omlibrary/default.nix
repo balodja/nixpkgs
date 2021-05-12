@@ -6,7 +6,7 @@ in
 mkOpenModelicaDerivation {
   pname = "omlibrary";
   omdir = "libraries";
-  omtarget = "omlibrary-core";
+  omtarget = "omlibrary-all";
   omdeps = [openmodelica.omcompiler];
 
   nativeBuildInputs = [];
@@ -16,5 +16,9 @@ mkOpenModelicaDerivation {
   patchPhase = ''
     patchShebangs --build libraries
     cp -fv ${fakegit}/bin/checkout-git.sh libraries/checkout-git.sh
+
+    # The EMOTH library is broken in OpenModelica 1.17.0
+    # Let's remove it from targets.
+    sed -i -e '/^OTHER_LIBS=/ s/EMOTH //' libraries/Makefile.libs
   '';
 }
