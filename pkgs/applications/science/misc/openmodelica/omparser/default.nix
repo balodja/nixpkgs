@@ -1,4 +1,4 @@
-{pkgconfig, jre, libuuid,
+{pkg-config, jre8, libuuid,
 openmodelica, mkOpenModelicaDerivation }:
 
 mkOpenModelicaDerivation rec {
@@ -6,9 +6,9 @@ mkOpenModelicaDerivation rec {
   omdir = "OMParser";
   omdeps = [openmodelica.omcompiler];
 
-  nativeBuildInputs = [pkgconfig];
+  nativeBuildInputs = [pkg-config];
 
-  buildInputs = [jre libuuid];
+  buildInputs = [jre8 libuuid];
 
   patchPhase = ''
     patch -p1 < ${./Makefile.in.patch}

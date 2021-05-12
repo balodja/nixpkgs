@@ -1,4 +1,4 @@
-{gfortran, flex, bison, jre, openblas, curl, readline, expat,
+{gfortran, flex, bison, jre8, openblas, curl, readline, expat,
 libffi, binutils, mkOpenModelicaDerivation}:
 
 mkOpenModelicaDerivation rec {
@@ -8,9 +8,9 @@ mkOpenModelicaDerivation rec {
   omdeps = [];
   omautoconf = true;
 
-  nativeBuildInputs = [gfortran flex bison];
+  nativeBuildInputs = [jre8 gfortran flex bison];
 
-  buildInputs = [jre openblas curl readline expat libffi binutils];
+  buildInputs = [openblas curl readline expat libffi binutils];
 
   preFixup = ''
     for entry in $(find $out -name libipopt.so); do

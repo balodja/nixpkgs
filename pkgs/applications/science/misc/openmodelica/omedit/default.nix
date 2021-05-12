@@ -1,4 +1,4 @@
-{lib, jre, qmake, qtbase, qttools, qtwebkit, qtxmlpatterns, binutils, wrapQtAppsHook,
+{lib, jre8, qmake, qtbase, qttools, qtwebkit, qtxmlpatterns, binutils, wrapQtAppsHook,
 openmodelica, mkOpenModelicaDerivation}:
 with openmodelica;
 mkOpenModelicaDerivation rec {
@@ -7,7 +7,7 @@ mkOpenModelicaDerivation rec {
   omdeps = [omcompiler omplot omparser omsimulator];
   omautoconf = true;
 
-  nativeBuildInputs = [jre qmake qtbase qttools wrapQtAppsHook];
+  nativeBuildInputs = [jre8 qmake qtbase qttools wrapQtAppsHook];
 
   buildInputs = [qtwebkit qtxmlpatterns binutils];
 
