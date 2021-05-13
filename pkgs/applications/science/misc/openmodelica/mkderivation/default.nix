@@ -102,8 +102,6 @@ in stdenv.mkDerivation (pkg // {
 
   dontUseCmakeConfigure = true;
 
-  enableParallelBuilding = false;
-
   hardeningDisable = ["format"];
 
   meta = with lib; {
