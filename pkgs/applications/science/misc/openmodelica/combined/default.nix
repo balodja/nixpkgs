@@ -1,4 +1,4 @@
-{stdenv, lib, openmodelica, symlinkJoin, gnumake, openblas, makeWrapper}:
+{stdenv, lib, openmodelica, symlinkJoin, gnumake, blas, lapack, makeWrapper}:
 with openmodelica;
 symlinkJoin {
   name = "openmodelica-combined";
@@ -10,7 +10,7 @@ symlinkJoin {
     wrapProgram $out/bin/OMEdit \
       --prefix PATH : "${gnumake}/bin" \
       --prefix PATH : "${stdenv.cc}/bin" \
-      --prefix LIBRARY_PATH : "${lib.makeLibraryPath [openblas]}" \
+      --prefix LIBRARY_PATH : "${lib.makeLibraryPath [blas lapack]}" \
       --set-default OPENMODELICALIBRARY "${omlibrary}/lib/omlibrary"
     '';
 }
