@@ -44,38 +44,40 @@ let
   omdir = getAttrDef "omdir" pkg.pname pkg;
 
   # Simple to to m4 configuration scripts
-  patchPhase = ifNoDeps "" ''
+  postPatch = ifNoDeps "" ''
       sed -i ''$(find -name omhome.m4) -e 's|if test ! -z "$USINGPRESETBUILDDIR"|if test ! -z "$USINGPRESETBUILDDIR" -a -z "$OMHOME"|'
     '' +
-    appendByAttr "patchPhase" "\n" pkg;
+    appendByAttr "postPatch" "\n" pkg;
 
   # Update shebangs in the scripts before running configuration.
   preAutoreconf = "patchShebangs --build common" +
     appendByAttr "preAutoreconf" "\n" pkg;
 
-  # We use configure flags twice, let's bind them:
-  configureFlags = ifNoDeps "" "--with-openmodelicahome=${joinedDeps} " +
-    "--with-ombuilddir=$OMBUILDDIR " +
-    "--prefix=$prefix " +
+  # Tell OpenModelica where built dependencies are located.
+  configureFlags = ifNoDeps "" "--with-openmodelicahome=${joinedDeps}" +
     appendByAttr "configureFlags" " " pkg;
 
   # Our own configurePhase that accounts for omautoconf
-  configurePhase = "export OMBUILDDIR=$PWD/build; ./configure --no-recursion ${configureFlags}; " +
-    (if omautoconf then " (cd ${omdir}; ./configure ${configureFlags})" else "");
+  configurePhase = ''
+    runHook preConfigure
+    export configureFlags="''${configureFlags} --with-ombuilddir=$PWD/build --prefix=$prefix"
+    ./configure --no-recursion $configureFlags;
+    if ${if omautoconf then "true" else "false"}; then
+      (cd ${omdir}; ./configure $configureFlags);
+    fi
+    runHook postConfigure
+    '';
 
   # Targets that we want to build ourselves:
   deptargets = lib.forEach pkg.omdeps (dep: dep.omtarget);
 
   # ... so we ask openmodelica makefile to skip those targets.
-  skipTargetsPhase = ''
+  preBuild = ''
     for target in ${concatStringsSep " " deptargets}; do
       touch ''${target}.skip;
     done
-  '';
-
-  # skipTargetsPhase is our own, so we notify the builder about it.
-  preBuildPhases = ifNoDeps "" "skipTargetsPhase " +
-    appendByAttr "preBuildPhases" " " pkg;
+    '' +
+    appendByAttr "preBuild" "\n" pkg;
 
   makeFlags = "${omtarget}" +
     appendByAttr "makeFlags" " " pkg;
@@ -86,10 +88,10 @@ let
 
 in stdenv.mkDerivation (pkg // {
   inherit omtarget;
-  inherit patchPhase;
+  inherit postPatch;
   inherit preAutoreconf;
   inherit configureFlags configurePhase;
-  inherit skipTargetsPhase preBuildPhases;
+  inherit preBuild;
   inherit makeFlags installFlags;
 
   src = fetchgit (import ./src-main.nix);
@@ -107,7 +109,7 @@ in stdenv.mkDerivation (pkg // {
   meta = with lib; {
     description = "An open-source Modelica-based modeling and simulation environment";
     homepage    = "https://openmodelica.org";
-    license     = licenses.gpl3;
+    license     = licenses.gpl3Only;
     maintainers = with maintainers; [ smironov ];
     platforms   = platforms.linux;
   };

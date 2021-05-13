@@ -1,4 +1,4 @@
-{gfortran, flex, bison, jre8, blas, lapack, curl, readline, expat,
+{gfortran, flex, bison, jre8, blas, lapack, curl, readline, expat, pkg-config,
 libffi, binutils, mkOpenModelicaDerivation}:
 
 mkOpenModelicaDerivation rec {
@@ -8,7 +8,7 @@ mkOpenModelicaDerivation rec {
   omdeps = [];
   omautoconf = true;
 
-  nativeBuildInputs = [jre8 gfortran flex bison];
+  nativeBuildInputs = [jre8 gfortran flex bison pkg-config];
 
   buildInputs = [blas lapack curl readline expat libffi binutils];
 
