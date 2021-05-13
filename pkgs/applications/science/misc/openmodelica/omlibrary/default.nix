@@ -13,7 +13,7 @@ mkOpenModelicaDerivation {
 
   buildInputs = [];
 
-  patchPhase = ''
+  postPatch = ''
     patchShebangs --build libraries
     cp -fv ${fakegit}/bin/checkout-git.sh libraries/checkout-git.sh
 

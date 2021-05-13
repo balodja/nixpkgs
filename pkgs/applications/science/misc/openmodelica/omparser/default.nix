@@ -10,7 +10,5 @@ mkOpenModelicaDerivation rec {
 
   buildInputs = [jre8 libuuid];
 
-  patchPhase = ''
-    patch -p1 < ${./Makefile.in.patch}
-  '';
+  patches = [./Makefile.in.patch];
 }

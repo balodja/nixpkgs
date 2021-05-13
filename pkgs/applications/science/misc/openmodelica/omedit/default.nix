@@ -11,7 +11,7 @@ mkOpenModelicaDerivation rec {
 
   buildInputs = [qtwebkit qtxmlpatterns binutils];
 
-  patchPhase = ''
+  postPatch = ''
     sed -i ''$(find -name qmake.m4) -e '/^\s*LRELEASE=/ s|LRELEASE=.*$|LRELEASE=${lib.getDev qttools}/bin/lrelease|'
     '';
 
