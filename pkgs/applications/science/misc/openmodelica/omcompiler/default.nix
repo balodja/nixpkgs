@@ -1,4 +1,5 @@
-{gfortran, flex, bison, jre8, blas, lapack, curl, readline, expat, pkg-config,
+{stdenv, gfortran, flex, bison, jre8, blas, lapack, curl, readline, expat, pkg-config,
+targetPackages,
 libffi, binutils, mkOpenModelicaDerivation}:
 
 mkOpenModelicaDerivation rec {
@@ -10,7 +11,14 @@ mkOpenModelicaDerivation rec {
 
   nativeBuildInputs = [jre8 gfortran flex bison pkg-config];
 
-  buildInputs = [blas lapack curl readline expat libffi binutils];
+  buildInputs = [targetPackages.stdenv.cc.cc blas lapack curl readline expat libffi binutils];
+
+  postPatch = ''
+    sed -i -e '/^\s*AR=ar$/ s/ar/${stdenv.cc.targetPrefix}ar/
+               /^\s*ar / s/ar /${stdenv.cc.targetPrefix}ar /
+               /^\s*ranlib/ s/ranlib /${stdenv.cc.targetPrefix}ranlib /' \
+        $(find ./OMCompiler -name 'Makefile*')
+  '';
 
   preFixup = ''
     for entry in $(find $out -name libipopt.so); do
