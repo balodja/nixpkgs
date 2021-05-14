@@ -1,7 +1,11 @@
-{stdenv, gfortran, flex, bison, jre8, blas, lapack, curl, readline, expat, pkg-config,
-targetPackages,
+{stdenv, lib, gfortran, flex, bison, jre8, blas, lapack, curl, readline, expat, pkg-config,
+buildPackages, targetPackages,
 libffi, binutils, mkOpenModelicaDerivation}:
 
+let
+  isCross = stdenv.buildPlatform != stdenv.hostPlatform;
+  nativeOMCompiler = buildPackages.openmodelica.omcompiler;
+in
 mkOpenModelicaDerivation rec {
   pname = "omcompiler";
   omtarget = "omc";
@@ -9,7 +13,9 @@ mkOpenModelicaDerivation rec {
   omdeps = [];
   omautoconf = true;
 
-  nativeBuildInputs = [jre8 gfortran flex bison pkg-config];
+  nativeBuildInputs = [
+    jre8 gfortran flex bison pkg-config
+  ] ++ lib.optional isCross nativeOMCompiler;
 
   buildInputs = [targetPackages.stdenv.cc.cc blas lapack curl readline expat libffi binutils];
 
@@ -26,4 +32,6 @@ mkOpenModelicaDerivation rec {
       patchelf --set-rpath '$ORIGIN':"$(patchelf --print-rpath $entry)" $entry
     done
   '';
+} // lib.optionalAttrs isCross {
+  configureFlags = lib.optionalString isCross "--with-omc=${nativeOMCompiler}/bin/omc";
 }
