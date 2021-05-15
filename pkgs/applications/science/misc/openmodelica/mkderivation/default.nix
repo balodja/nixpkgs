@@ -54,8 +54,8 @@ let
     appendByAttr "preAutoreconf" "\n" pkg;
 
   # Tell OpenModelica where built dependencies are located.
-  configureFlags = ifNoDeps "" "--with-openmodelicahome=${joinedDeps}" +
-    appendByAttr "configureFlags" " " pkg;
+  configureFlags = ifNoDeps [] ["--with-openmodelicahome=${joinedDeps}"] ++
+    getAttrDef "configureFlags" [] pkg;
 
   # Our own configurePhase that accounts for omautoconf
   configurePhase = ''

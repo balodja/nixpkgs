@@ -6,7 +6,7 @@ let
   isCross = stdenv.buildPlatform != stdenv.hostPlatform;
   nativeOMCompiler = buildPackages.openmodelica.omcompiler;
 in
-mkOpenModelicaDerivation rec {
+mkOpenModelicaDerivation ({
   pname = "omcompiler";
   omtarget = "omc";
   omdir = "OMCompiler";
@@ -33,5 +33,5 @@ mkOpenModelicaDerivation rec {
     done
   '';
 } // lib.optionalAttrs isCross {
-  configureFlags = lib.optionalString isCross "--with-omc=${nativeOMCompiler}/bin/omc";
-}
+  configureFlags = ["--with-omc=${nativeOMCompiler}/bin/omc"];
+})
