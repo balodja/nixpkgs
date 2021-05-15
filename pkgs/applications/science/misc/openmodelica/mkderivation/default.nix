@@ -19,10 +19,8 @@ let
   # "Hello" + appendByAttr "a" " " {} = "Hello"
   appendByAttr = attr: sep: x: if hasAttr attr x then sep + (getAttr attr x) else "";
 
-  # Partially applied "if"
-  ifNoDeps = def: x:
-    if length pkg.omdeps == 0 then def else x;
-
+  # Are there any OM dependencies at all?
+  ifDeps = length pkg.omdeps != 0;
 
   # Dependencies of current OpenModelica-target joined in one file tree.
   # Return the dep itself in case it is a single one.
@@ -44,7 +42,7 @@ let
   omdir = getAttrDef "omdir" pkg.pname pkg;
 
   # Simple to to m4 configuration scripts
-  postPatch = ifNoDeps "" ''
+  postPatch = lib.optionalString ifDeps ''
     sed -i ''$(find -name omhome.m4) -e 's|if test ! -z "$USINGPRESETBUILDDIR"|if test ! -z "$USINGPRESETBUILDDIR" -a -z "$OMHOME"|'
     '' +
     appendByAttr "postPatch" "\n" pkg;
@@ -54,7 +52,7 @@ let
     appendByAttr "preAutoreconf" "\n" pkg;
 
   # Tell OpenModelica where built dependencies are located.
-  configureFlags = ifNoDeps [] ["--with-openmodelicahome=${joinedDeps}"] ++
+  configureFlags = lib.optional ifDeps "--with-openmodelicahome=${joinedDeps}" ++
     getAttrDef "configureFlags" [] pkg;
 
   # Our own configurePhase that accounts for omautoconf
@@ -100,7 +98,7 @@ in stdenv.mkDerivation (pkg // {
   nativeBuildInputs = pkg.nativeBuildInputs ++
     [autoconf automake libtool cmake autoreconfHook];
 
-  buildInputs = pkg.buildInputs ++ [joinedDeps];
+  buildInputs = pkg.buildInputs ++ lib.optional ifDeps joinedDeps;
 
   dontUseCmakeConfigure = true;
 
