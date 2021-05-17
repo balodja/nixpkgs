@@ -9,10 +9,6 @@ mkOpenModelicaDerivation {
   omtarget = "omlibrary-all";
   omdeps = [openmodelica.omcompiler];
 
-  nativeBuildInputs = [];
-
-  buildInputs = [];
-
   postPatch = ''
     patchShebangs --build libraries
     cp -fv ${fakegit}/bin/checkout-git.sh libraries/checkout-git.sh

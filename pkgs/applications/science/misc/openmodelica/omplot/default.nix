@@ -9,8 +9,6 @@ mkOpenModelicaDerivation rec {
 
   nativeBuildInputs = [qtbase qttools qmake wrapQtAppsHook];
 
-  buildInputs = [];
-
   postPatch = ''
     sed -i OMPlot/Makefile.in -e 's|bindir = @includedir@|includedir = @includedir@|'
     sed -i OMPlot/OMPlot/OMPlotGUI/*.pro -e '/INCLUDEPATH +=/s|$| ../../qwt/src|'

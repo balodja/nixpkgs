@@ -1,25 +1,27 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-CWD=`pwd`
+CWD=$PWD
 
-chko() { (
-T=`mktemp -d`
-trap "rm -rf $T" EXIT INT PIPE
-cd $T
-cat >check.nix <<EOF
+chko() {
+  (
+    T=`mktemp -d`
+    trap "rm -rf $T" EXIT INT PIPE
+    cd $T
+    cat >check.nix <<EOF
 with import <nixpkgs> {};
 fetchgit `cat $CWD/../mkderivation/src-main.nix`
-EOF
-nix-build check.nix
-cat result/libraries/Makefile.libs
-) }
+    EOF
+    nix-build check.nix
+    cat result/libraries/Makefile.libs
+  )
+}
 
-getsha256() { (
-URL=$(echo "$1" | sed 's/^"\(.*\)"$/\1/')
-REV=$(echo "$2" | sed 's/^"\(.*\)"$/\1/')
-SHA=$(nix run nixpkgs.nix-prefetch-git -c nix-prefetch-git --fetch-submodules "$URL" "$REV" 2>/dev/null | sed -n 's/.*"sha256": "\(.*\)",/\1/g p')
-echo "{ url = $1; rev = $2; sha256 = \"$SHA\"; fetchSubmodules = true; }"
-) }
+getsha256() {
+  URL=$(echo "$1" | sed 's/^"\(.*\)"$/\1/')
+  REV=$(echo "$2" | sed 's/^"\(.*\)"$/\1/')
+  SHA=$(nix run nixpkgs.nix-prefetch-git -c nix-prefetch-git --fetch-submodules "$URL" "$REV" 2>/dev/null | sed -n 's/.*"sha256": "\(.*\)",/\1/g p')
+  echo "{ url = $1; rev = $2; sha256 = \"$SHA\"; fetchSubmodules = true; }"
+}
 
 OUT=src-libs.nix
 
@@ -34,4 +36,3 @@ while read NM TGT URL BR REV ; do
 done
 
 echo ']' >> $OUT
-
