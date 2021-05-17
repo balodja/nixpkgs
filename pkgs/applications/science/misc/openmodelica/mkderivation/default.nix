@@ -87,18 +87,13 @@ let
 
 
 in stdenv.mkDerivation (pkg // {
-  inherit omtarget;
-  inherit postPatch;
-  inherit preAutoreconf;
-  inherit configureFlags configurePhase;
-  inherit preBuild;
-  inherit makeFlags installFlags;
+  inherit omtarget postPatch preAutoreconf configureFlags configurePhase preBuild makeFlags installFlags;
 
   src = fetchgit (import ./src-main.nix);
   version = "1.17.0";
 
-  nativeBuildInputs = pkg.nativeBuildInputs ++
-    [autoconf automake libtool cmake autoreconfHook];
+  nativeBuildInputs = pkg.nativeBuildInputs
+    ++ [ autoconf automake libtool cmake autoreconfHook ];
 
   buildInputs = pkg.buildInputs ++ [joinedDeps];
 

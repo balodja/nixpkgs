@@ -29,6 +29,4 @@ mkOpenModelicaDerivation rec {
     '';
 
   dontUseQmakeConfigure = true;
-
-#  NIX_CFLAGS_COMPILE = "-isystem ${omcompiler}/include/omc/c";
 }

@@ -1,12 +1,13 @@
-{pkg-config, readline, libxml2,
-openmodelica, mkOpenModelicaDerivation}:
+{ pkg-config, readline, libxml2
+, openmodelica, mkOpenModelicaDerivation
+}:
 
 mkOpenModelicaDerivation rec {
   pname = "omsimulator";
   omdir = "OMSimulator";
-  omdeps = [openmodelica.omcompiler];
+  omdeps = [ openmodelica.omcompiler ];
 
-  nativeBuildInputs = [pkg-config];
+  nativeBuildInputs = [ pkg-config ];
 
-  buildInputs = [readline libxml2];
+  buildInputs = [ readline libxml2 ];
 }
