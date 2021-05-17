@@ -1,9 +1,8 @@
 # mkOpenModelicaDerivation is an mkDerivation function for packages
 # from OpenModelica suite.
 
-{stdenv, lib, fetchgit, autoconf, automake, libtool, cmake, autoreconfHook, symlinkJoin}:
+{ stdenv, lib, fetchgit, autoconf, automake, libtool, cmake, autoreconfHook, symlinkJoin }:
 pkg:
-
 let
   inherit (builtins) hasAttr getAttr length elemAt;
   inherit (lib) attrByPath concatStringsSep;
@@ -12,7 +11,7 @@ let
   # A few helpers functions:
 
   # getAttrDef is just a getAttr with default fallback
-  getAttrDef = attr: default: x: attrByPath [attr] default x;
+  getAttrDef = attr: default: x: attrByPath [ attr ] default x;
 
   # getAttr-like helper for optional append to string:
   # "Hello" + appendByAttr "a" " " {a = "world";} = "Hello world"
@@ -27,10 +26,11 @@ let
   joinedDeps =
     if length pkg.omdeps == 1
     then elemAt pkg.omdeps 0
-    else symlinkJoin {
-           name = pkg.pname + "-omhome";
-           paths = pkg.omdeps;
-         };
+    else
+      symlinkJoin {
+        name = pkg.pname + "-omhome";
+        paths = pkg.omdeps;
+      };
 
   # Should we run ./configure for the target pkg?
   omautoconf = getAttrDef "omautoconf" false pkg;
@@ -44,8 +44,8 @@ let
   # Simple to to m4 configuration scripts
   postPatch = lib.optionalString ifDeps ''
     sed -i ''$(find -name omhome.m4) -e 's|if test ! -z "$USINGPRESETBUILDDIR"|if test ! -z "$USINGPRESETBUILDDIR" -a -z "$OMHOME"|'
-    '' +
-    appendByAttr "postPatch" "\n" pkg;
+  '' +
+  appendByAttr "postPatch" "\n" pkg;
 
   # Update shebangs in the scripts before running configuration.
   preAutoreconf = "patchShebangs --build common" +
@@ -53,7 +53,7 @@ let
 
   # Tell OpenModelica where built dependencies are located.
   configureFlags = lib.optional ifDeps "--with-openmodelicahome=${joinedDeps}" ++
-    getAttrDef "configureFlags" [] pkg;
+    getAttrDef "configureFlags" [ ] pkg;
 
   # Our own configurePhase that accounts for omautoconf
   configurePhase = ''
@@ -64,7 +64,7 @@ let
       (cd ${omdir}; ./configure $configureFlags);
     fi
     runHook postConfigure
-    '';
+  '';
 
   # Targets that we want to build ourselves:
   deptargets = lib.forEach pkg.omdeps (dep: dep.omtarget);
@@ -74,8 +74,8 @@ let
     for target in ${concatStringsSep " " deptargets}; do
       touch ''${target}.skip;
     done
-    '' +
-    appendByAttr "preBuild" "\n" pkg;
+  '' +
+  appendByAttr "preBuild" "\n" pkg;
 
   makeFlags = "${omtarget}" +
     appendByAttr "makeFlags" " " pkg;
@@ -84,27 +84,28 @@ let
     appendByAttr "installFlags" " " pkg;
 
 
-in stdenv.mkDerivation (pkg // {
+in
+stdenv.mkDerivation (pkg // {
   inherit omtarget postPatch preAutoreconf configureFlags configurePhase preBuild makeFlags installFlags;
 
   src = fetchgit (import ./src-main.nix);
   version = "1.17.0";
 
-  nativeBuildInputs = getAttrDef "nativeBuildInputs" [] pkg
+  nativeBuildInputs = getAttrDef "nativeBuildInputs" [ ] pkg
     ++ [ autoconf automake libtool cmake autoreconfHook ];
 
-  buildInputs = getAttrDef "buildInputs" [] pkg
+  buildInputs = getAttrDef "buildInputs" [ ] pkg
     ++ lib.optional ifDeps joinedDeps;
 
   dontUseCmakeConfigure = true;
 
-  hardeningDisable = ["format"];
+  hardeningDisable = [ "format" ];
 
   meta = with lib; {
     description = "An open-source Modelica-based modeling and simulation environment";
-    homepage    = "https://openmodelica.org";
-    license     = licenses.gpl3Only;
+    homepage = "https://openmodelica.org";
+    license = licenses.gpl3Only;
     maintainers = with maintainers; [ smironov ];
-    platforms   = platforms.linux;
+    platforms = platforms.linux;
   };
 })

@@ -1,14 +1,18 @@
-{pkg-config, jre8, libuuid,
-openmodelica, mkOpenModelicaDerivation }:
+{ pkg-config
+, jre8
+, libuuid
+, openmodelica
+, mkOpenModelicaDerivation
+}:
 
 mkOpenModelicaDerivation rec {
   pname = "omparser";
   omdir = "OMParser";
-  omdeps = [openmodelica.omcompiler];
+  omdeps = [ openmodelica.omcompiler ];
 
-  nativeBuildInputs = [pkg-config];
+  nativeBuildInputs = [ pkg-config ];
 
-  buildInputs = [jre8 libuuid];
+  buildInputs = [ jre8 libuuid ];
 
-  patches = [./Makefile.in.patch];
+  patches = [ ./Makefile.in.patch ];
 }

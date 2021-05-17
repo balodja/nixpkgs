@@ -1,5 +1,8 @@
-{ pkg-config, readline, libxml2
-, openmodelica, mkOpenModelicaDerivation
+{ pkg-config
+, readline
+, libxml2
+, openmodelica
+, mkOpenModelicaDerivation
 }:
 
 mkOpenModelicaDerivation rec {

@@ -1,5 +1,13 @@
-{lib, stdenv, fetchgit, bash, pkg-config, jre8, libuuid,
-openmodelica, mkOpenModelicaDerivation }:
+{ lib
+, stdenv
+, fetchgit
+, bash
+, pkg-config
+, jre8
+, libuuid
+, openmodelica
+, mkOpenModelicaDerivation
+}:
 let
   fakegit = import ./fakegit.nix { inherit lib stdenv fetchgit bash; };
 in
@@ -7,7 +15,7 @@ mkOpenModelicaDerivation {
   pname = "omlibrary";
   omdir = "libraries";
   omtarget = "omlibrary-all";
-  omdeps = [openmodelica.omcompiler];
+  omdeps = [ openmodelica.omcompiler ];
 
   postPatch = ''
     patchShebangs --build libraries
