@@ -7896,6 +7896,7 @@ in
     omparser = callPackage ../applications/science/misc/openmodelica/omparser { };
     omedit = libsForQt5.callPackage ../applications/science/misc/openmodelica/omedit { };
     omlibrary = callPackage ../applications/science/misc/openmodelica/omlibrary { };
+    omshell = libsForQt5.callPackage ../applications/science/misc/openmodelica/omshell { };
     combined = callPackage ../applications/science/misc/openmodelica/combined { };
   };
 

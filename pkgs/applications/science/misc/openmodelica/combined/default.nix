@@ -2,7 +2,7 @@
 with openmodelica;
 symlinkJoin {
   name = "openmodelica-combined";
-  paths = [omcompiler omsimulator omplot omparser omedit omlibrary];
+  paths = [omcompiler omsimulator omplot omparser omedit omlibrary omshell];
 
   buildInputs = [gnumake makeWrapper];
 
