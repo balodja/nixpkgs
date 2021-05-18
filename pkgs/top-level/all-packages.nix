@@ -7887,18 +7887,7 @@ in
 
   ucx = callPackage ../development/libraries/ucx {};
 
-  mkOpenModelicaDerivation = callPackage ../applications/science/misc/openmodelica/mkderivation { };
-
-  openmodelica = recurseIntoAttrs {
-    omcompiler = callPackage ../applications/science/misc/openmodelica/omcompiler { };
-    omplot = libsForQt5.callPackage ../applications/science/misc/openmodelica/omplot { };
-    omsimulator = callPackage ../applications/science/misc/openmodelica/omsimulator { };
-    omparser = callPackage ../applications/science/misc/openmodelica/omparser { };
-    omedit = libsForQt5.callPackage ../applications/science/misc/openmodelica/omedit { };
-    omlibrary = callPackage ../applications/science/misc/openmodelica/omlibrary { };
-    omshell = libsForQt5.callPackage ../applications/science/misc/openmodelica/omshell { };
-    combined = callPackage ../applications/science/misc/openmodelica/combined { };
-  };
+  openmodelica = callPackage ../applications/science/misc/openmodelica {};
 
   qarte = libsForQt5.callPackage ../applications/video/qarte { };
 
