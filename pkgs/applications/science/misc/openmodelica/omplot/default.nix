@@ -22,4 +22,5 @@ mkOpenModelicaDerivation rec {
   '';
 
   dontUseQmakeConfigure = true;
+  QMAKESPEC = "linux-clang";
 }

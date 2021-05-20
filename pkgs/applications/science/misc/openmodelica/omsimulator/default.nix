@@ -1,4 +1,5 @@
 { pkg-config
+, boost
 , readline
 , libxml2
 , openmodelica
@@ -12,5 +13,5 @@ mkOpenModelicaDerivation rec {
 
   nativeBuildInputs = [ pkg-config ];
 
-  buildInputs = [ readline libxml2 ];
+  buildInputs = [ readline libxml2 boost ];
 }
